@@ -1,0 +1,2 @@
+# pgzero-training
+pgzero-kurs

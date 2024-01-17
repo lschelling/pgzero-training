@@ -11,18 +11,9 @@ WHITE = 255, 255, 255
 GREEN = 0,255,0
 RED = 255,0,0
 GREY= 100,100,100
-
-class Apple :
-    def __init__(self):
-        self.new_apple()
-        
-    def new_apple(self):
-        self.ypos=random.randint(2,BOARD_SIZE-2)
-        self.xpos=random.randint(1,BOARD_SIZE-2)        
+              
     
-    def draw(self,screen) :
-        r =Rect (self.xpos*SEGMENT_SIZE, self.ypos*SEGMENT_SIZE, SEGMENT_SIZE, SEGMENT_SIZE) 
-        screen.draw.filled_rect(r,RED)
+
             
                 
 class Segment:
@@ -32,7 +23,7 @@ class Segment:
 
 class Snake:
     
-    def __init__(self, board_size, segment_size):
+    def __init__(self, board_size, segment_size, apples_collect):
         self.segment_size=segment_size
         self.board_size=board_size
         self.segments=[]
@@ -43,14 +34,35 @@ class Snake:
         self.setup_apples()
         self.score=0
         self.gameover=False
-        self.collect_done = 3
+        self.collect_done = apples_collect
         self.cframe= 0
         self.speed= 20
+    def add_apple (self):
+        while True:
+            free = True
+            y=random.randint(2,BOARD_SIZE-2)
+            x=random.randint(1,BOARD_SIZE-2)
+        
+            for s in self.segments:
+                if x== s.xpos and y== s.ypos :
+                    free = False
+            for b in self.bricks:
+                if x== b.xpos and y== b.ypos :
+                    free = False
+            for a in self.apples:
+                if x== a.xpos and y== a.ypos :
+                    free = False
+        
+            if free:
+                break
+        self.apples.append(Segment(x,y))
+
+    
 
 
     def setup_apples(self):
-        self.apples.append(Apple())
-    
+        self.add_apple()
+
     def setup_snake(self):
         self.segments.append(Segment(self.board_size//2,self.board_size//2))
         self.segments.append(Segment(self.board_size//2,self.board_size//2+1))
@@ -80,7 +92,11 @@ class Snake:
         for b in self.bricks:
             r =Rect (b.xpos*self.segment_size, b.ypos*self.segment_size, self.segment_size, self.segment_size) 
             screen.draw.filled_rect(r,GREY)
-        self.apples[0].draw(screen)
+
+        for a in self.apples:
+            r =Rect (a.xpos*self.segment_size, a.ypos*self.segment_size, self.segment_size, self.segment_size) 
+            screen.draw.filled_rect(r,RED)
+
         screen.draw.text('score__'+str(self.score),(0,0),color=(0,255,255))
         screen.draw.text('level__'+str(level),(self.board_size*self.segment_size-120,0),color=(0,255,255))
         
@@ -116,7 +132,8 @@ class Snake:
             if False==self.check_gameover(x,y) :
                 self.segments.insert(0,Segment(x,y))
                 if self.apples[0].xpos==x and self.apples[0].ypos==y :
-                    self.apples[0]=Apple()
+                    self.apples.remove(self.apples[0])
+                    self.add_apple()
                     self.score+=1
                 else:
                     self.segments.pop()
@@ -127,3 +144,16 @@ class Snake:
         if self.cframe % (60*2) == 0 and self.speed > 2:
             self.speed-=1
 
+class Snake2 (Snake):
+    
+    def setup_walls(self):
+        super().setup_walls()
+        ypos=random.randint(2,BOARD_SIZE-2)
+        xpos=random.randint(1,BOARD_SIZE-2)
+        self.bricks.append(Segment(xpos,ypos))
+        
+            
+            
+            
+            
+        

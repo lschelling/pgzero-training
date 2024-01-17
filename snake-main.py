@@ -2,6 +2,7 @@ import pgzrun as pgz
 import random
 from enum import Enum
 from snake import Snake
+from snake import Snake2
 
 BOARD_SIZE = 16
 SEGMENT_SIZE = 20
@@ -23,21 +24,24 @@ class GameState(Enum):
 class Game():
 
     def __init__(self):
+        self.level=0
         self.transitionStart()
-        self.level=1
 
     def transitionPlay(self):
         self.state=GameState.PLAY
 
     def transitionStart(self):
-        self.snake= Snake(BOARD_SIZE, SEGMENT_SIZE)
+        self.level+=1
+        self.snake= Snake2(BOARD_SIZE, SEGMENT_SIZE, 3*self.level)
         self.state=GameState.START
+        
 
     def transitionSuccess(self):
         self.state=GameState.SUCCESS
 
     def transitionGameover(self):
         self.state=GameState.GAMEOVER
+        self.level=0
 
 game=Game()
 
@@ -85,7 +89,8 @@ def update():
         game.snake.update(richtung)
         if game.snake.level_done():
             richtung = ''
-            game.transitionSuccess()
+            game.transitionStart()
+            
         if game.snake.gameover:
             richtung = ''
             game.transitionGameover()

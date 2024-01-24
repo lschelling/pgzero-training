@@ -1,7 +1,7 @@
 import pgzrun as pgz
 from pygame import Rect
 import random
-
+from maze import Maze
 
 BOARD_SIZE = 16
 SEGMENT_SIZE = 20
@@ -11,10 +11,6 @@ WHITE = 255, 255, 255
 GREEN = 0,255,0
 RED = 255,0,0
 GREY= 100,100,100
-              
-    
-
-            
                 
 class Segment:
      def __init__(self, xpos, ypos):
@@ -29,8 +25,8 @@ class Snake:
         self.segments=[]
         self.bricks=[]
         self.apples=[]
-        self.setup_snake()
         self.setup_walls()
+        self.setup_snake()
         self.setup_apples()
         self.score=0
         self.gameover=False
@@ -151,9 +147,39 @@ class Snake2 (Snake):
         ypos=random.randint(2,BOARD_SIZE-2)
         xpos=random.randint(1,BOARD_SIZE-2)
         self.bricks.append(Segment(xpos,ypos))
+
+class SnakeMaze (Snake):
+    def setup_walls(self):
+        sizex=BOARD_SIZE//2-1
+        sizey=BOARD_SIZE//2-1
+        self.maze = Maze.generate(sizex,sizey)
+        m = self.maze._to_str_matrix()
+        for y in range(len(m)):
+            for x in range(len(m[y])):
+                if m[x][y]=='O':
+                    self.bricks.append(Segment(x,y+1))
+
+            
+    def setup_snake(self):
+        while True:
+            free = True
+            y=random.randint(2,BOARD_SIZE-2)
+            x=random.randint(1,BOARD_SIZE-2)
         
-            
-            
-            
-            
+            for s in self.segments:
+                if x== s.xpos and y== s.ypos :
+                    free = False
+            for b in self.bricks:
+                if x== b.xpos and y== b.ypos :
+                    free = False
+            for a in self.apples:
+                if x== a.xpos and y== a.ypos :
+                    free = False
+        
+            if free:
+                break
+        self.segments.append(Segment(x,y))
+
+    def get_level_text(self):
+        return 'Find the way to the apple '
         

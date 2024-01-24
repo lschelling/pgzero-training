@@ -1,8 +1,7 @@
 import pgzrun as pgz
 import random
 from enum import Enum
-from snake import Snake
-from snake import Snake2
+from snake import Snake, Snake2, SnakeMaze
 
 BOARD_SIZE = 16
 SEGMENT_SIZE = 20
@@ -32,7 +31,7 @@ class Game():
 
     def transitionStart(self):
         self.level+=1
-        self.snake= Snake2(BOARD_SIZE, SEGMENT_SIZE, 3*self.level)
+        self.snake= SnakeMaze(BOARD_SIZE, SEGMENT_SIZE, 3*self.level)
         self.state=GameState.START
         
 

@@ -31,11 +31,25 @@ class Game():
 
     def transitionStart(self):
         self.level+=1
-        self.snake= SnakeMaze(BOARD_SIZE, SEGMENT_SIZE, 3*self.level)
+        self.snake= self.Snakefactory()
         self.state=GameState.START
-        
+    
+    def Snakefactory(self):
+        self.Success= False
+        if (self.level==1):
+            return Snake(BOARD_SIZE, SEGMENT_SIZE, 4)
+        elif (self.level==2):
+            return Snake(BOARD_SIZE, SEGMENT_SIZE, 8)
+        elif (self.level==3):
+            return Snake2(BOARD_SIZE, SEGMENT_SIZE, 4)
+        elif (self.level==4):
+            return Snake2(BOARD_SIZE, SEGMENT_SIZE, 8)
+        elif (self.level==5):
+            self.Success= True
+            return SnakeMaze(BOARD_SIZE, SEGMENT_SIZE, 2) 
 
     def transitionSuccess(self):
+        self.level+=1
         self.state=GameState.SUCCESS
 
     def transitionGameover(self):
@@ -48,13 +62,12 @@ game=Game()
 def draw_start(screen):
     screen.draw.text(game.snake.get_level_text(),(WIDTH//2-100,HEIGHT//2),color=(0,255,255))
     screen.draw.text('Press space to start',(WIDTH//2-100,HEIGHT//2+20),color=(0,255,255))
-    
 
 def draw_gameover(screen):
     screen.draw.text('Gameover',(WIDTH//2-100,HEIGHT//2),color=(0,255,255))
 
-def draw_leveldone(screen, score, level):
-    screen.draw.text('Level completed',(WIDTH//2-100,HEIGHT//2),color=(0,255,255))
+def draw_gamedone(screen, score, level):
+    screen.draw.text('You Win',(WIDTH//2-100,HEIGHT//2),color=(0,255,255))
 
 
 def draw():
@@ -64,20 +77,20 @@ def draw():
     if game.state==GameState.PLAY:
         game.snake.draw(screen, game.level)
     if game.state==GameState.SUCCESS:
-        draw_leveldone(screen, game.snake.score, game.level)
+        draw_gamedone(screen, game.snake.score, game.level)
     if game.state==GameState.GAMEOVER:
         draw_gameover(screen)
        
 
 def update():
     global richtung
-    if keyboard.right:
+    if keyboard.right or keyboard.KP6  :
         richtung = 'E'
-    elif keyboard.left:
+    elif keyboard.left or keyboard.KP4:
         richtung = 'W'
-    elif keyboard.down:
+    elif keyboard.down or keyboard.KP2 :
          richtung = 'N'
-    elif keyboard.up:
+    elif keyboard.up or keyboard.KP8:
         richtung = 'S'
 
     if game.state==GameState.START:
@@ -88,7 +101,10 @@ def update():
         game.snake.update(richtung)
         if game.snake.level_done():
             richtung = ''
-            game.transitionStart()
+            if game.Success:
+                game.transitionSuccess()
+            else:
+                game.transitionStart()
             
         if game.snake.gameover:
             richtung = ''
@@ -96,7 +112,7 @@ def update():
     if game.state==GameState.SUCCESS:
         if keyboard.space:
             richtung = ''
-            game.transitionStart()
+            exit()
     if game.state==GameState.GAMEOVER:
         if keyboard.space:
             richtung = ''

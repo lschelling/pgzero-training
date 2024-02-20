@@ -2,6 +2,8 @@ import pgzrun as pgz
 from pygame import Rect
 import random
 from maze import Maze
+from pgzero.builtins import Actor
+
 
 BOARD_SIZE = 16
 SEGMENT_SIZE = 20
@@ -33,6 +35,12 @@ class Snake:
         self.collect_done = apples_collect
         self.cframe= 0
         self.speed= 20
+        self.garden =Actor('garden')
+        self.snakebody =Actor('body')
+        self.snakehead = Actor('head')
+        self.brick = Actor('brick')
+        self.apple = Actor('apple')
+    
     def add_apple (self):
         while True:
             free = True
@@ -76,22 +84,37 @@ class Snake:
         return 'Collect ' + str(self.collect_done) + ' apples'
     
     def draw(self,screen, level) :
+        self.garden.left = (20)
+        self.garden.top = (40) 
+        self.garden.draw()
+        
 
         h = True
         for s in self.segments:
-            r =Rect (s.xpos*self.segment_size, s.ypos*self.segment_size, self.segment_size, self.segment_size) 
+            self.snakebody.left = (s.xpos*self.segment_size)
+            self.snakebody.top = (s.ypos*self.segment_size) 
+            self.snakebody.draw()
+            
+             
             if h :
-                screen.draw.filled_rect(r,WHITE)
-                h = False
+                 self.snakehead.left = (s.xpos*self.segment_size)
+                 self.snakehead.top = (s.ypos*self.segment_size)
+                 self.snakehead.draw()
+#                  screen.draw.filled_rect(r,WHITE)
+                 h = False
             else :
-                screen.draw.filled_rect(r,GREEN)
+                self.snakebody.draw()
+#                 screen.draw.filled_rect(r,GREEN)
         for b in self.bricks:
-            r =Rect (b.xpos*self.segment_size, b.ypos*self.segment_size, self.segment_size, self.segment_size) 
-            screen.draw.filled_rect(r,GREY)
-
+            self.brick.left = (b.xpos*self.segment_size)
+            self.brick.top = (b.ypos*self.segment_size) 
+            self.brick.draw()
+            
+        apple = Actor('apple')
         for a in self.apples:
-            r =Rect (a.xpos*self.segment_size, a.ypos*self.segment_size, self.segment_size, self.segment_size) 
-            screen.draw.filled_rect(r,RED)
+            self.apple.left = (a.xpos*self.segment_size)
+            self.apple.top = (a.ypos*self.segment_size) 
+            self.apple.draw()
 
         screen.draw.text('score__'+str(self.score),(0,0),color=(0,255,255))
         screen.draw.text('level__'+str(level),(self.board_size*self.segment_size-120,0),color=(0,255,255))
@@ -116,12 +139,16 @@ class Snake:
             y = self.segments[0].ypos
             if richtung =='N':
                 y = y+1
+                self.snakehead.angle = 180
             elif richtung =='E':
                 x = x+1
+                self.snakehead.angle = 270
             elif richtung =='W':
                 x= x-1
+                self.snakehead.angle = 90
             elif richtung =='S':
                 y= y-1
+                self.snakehead.angle = 0
             else:
                 return
 
@@ -144,9 +171,10 @@ class Snake2 (Snake):
     
     def setup_walls(self):
         super().setup_walls()
-        ypos=random.randint(2,BOARD_SIZE-2)
-        xpos=random.randint(1,BOARD_SIZE-2)
-        self.bricks.append(Segment(xpos,ypos))
+        for i in range (20):
+            ypos=random.randint(2,BOARD_SIZE-2)
+            xpos=random.randint(1,BOARD_SIZE-2)
+            self.bricks.append(Segment(xpos,ypos))
 
 class SnakeMaze (Snake):
     def setup_walls(self):
